@@ -1,0 +1,25 @@
+body {
+  font-family: sans-serif;
+  background: #12bac7;
+  color: white;
+  text-align: center;
+  font-size: 1vw;
+}
+
+h1 {
+  font-size: 3vw;
+}
+
+.container {
+  margin: 0px 3em 0px 3em;
+}
+
+.sound {
+  text-align: center;
+  border: 5px solid #ccb03b;
+  border-radius: 20px;
+  background: #8c61a5;
+  margin: 2px;
+  display: inline-block;
+  width: 20%;
+}
