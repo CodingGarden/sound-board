@@ -1,4 +1,10 @@
 const soundsElement = document.querySelector('#sounds');
+const stopButton = document.querySelector('#stopButton');
+const players = [];
+
+let keyCodes = [81, 87, 69, 82, 65, 83, 68, 70, 90, 88, 67, 86];
+
+stopButton.addEventListener('click', stopAll);
 
 (async () => {
   const sounds = await getSounds();
@@ -12,71 +18,71 @@ async function getSounds() {
 }
 
 function addSoundsToPage(sounds) {
-  const players = [];
+  sounds.forEach(addSoundToPage);
 
-  sounds.forEach(sound => {
-    const soundDiv = document.createElement('div');
-    soundDiv.className = 'sound';
-    const soundTitle = document.createElement('h2');
-    soundTitle.textContent = sound.title;
-    soundDiv.appendChild(soundTitle);
+  listenKeyPress();
+}
 
-    const player = document.createElement('audio');
-    player.setAttribute('src', `sounds/${sound.src}`)
-    soundDiv.appendChild(player);
-    players.push({ player, soundDiv });
 
-    soundDiv.addEventListener('mousedown', () => {
-      soundDiv.style.background = '#0941a1';
-      player.currentTime = 0;
-      player.play();
-    });
+function addSoundToPage(sound, index) {
+  const soundDiv = document.createElement('div');
+  soundDiv.className = 'sound';
+  const soundTitle = document.createElement('h2');
+  soundTitle.textContent = sound.title;
+  soundDiv.appendChild(soundTitle);
 
-    soundDiv.addEventListener('mouseup', () => {
-      soundDiv.style.background = '';
-    });
+  const key = document.createElement('img');
+  key.setAttribute('src', `keys/${keyCodes[index]}.png`)
+  soundDiv.appendChild(key);
 
-    soundsElement.appendChild(soundDiv);
+  const player = document.createElement('audio');
+  player.setAttribute('src', `sounds/${sound.src}`)
+  soundDiv.appendChild(player);
+  players.push({ player, soundDiv, key });
+
+  soundDiv.addEventListener('mousedown', () => {
+    soundPress(soundDiv, player);
   });
 
-  document.querySelector('#stopButton').addEventListener('click', stopAll);
+  soundDiv.addEventListener('mouseup', () => {
+    soundDiv.style.background = '';
+  });
 
-  const keyCodes = {
-    65: 0,
-    83: 1,
-    68: 2,
-    70: 3,
-    71: 4,
-    72: 5,
-    74: 6,
-    75: 7,
-    76: 8,
-    186: 9,
-    222: 10,
-    90: 11
-  }
+  soundsElement.appendChild(soundDiv);
+}
 
+function soundPress(div, player) {
+  div.style.background = '#0941a1';
+  player.currentTime = 0;
+  player.play();
+}
+
+function listenKeyPress() {
   document.addEventListener('keydown', (event) => {
-    const playerIndex = keyCodes[event.keyCode];
+    console.log(event);
+    if (event.keyCode == 32) return stopAll();
+    const playerIndex = keyCodes.indexOf(event.keyCode);
     const playerAndDiv = players[playerIndex];
-    if (playerAndDiv) {
-      playerAndDiv.soundDiv.style.background = '#0941a1';
-      playerAndDiv.player.currentTime = 0;
-      playerAndDiv.player.play();
+    if (playerAndDiv && !playerAndDiv.keydown) {
+      playerAndDiv.keydown = true;
+      playerAndDiv.key.style.transform = 'scaleY(0.75)';
+      soundPress(playerAndDiv.soundDiv, playerAndDiv.player);
     }
   });
 
   document.addEventListener('keyup', (event) => {
-    const playerIndex = keyCodes[event.keyCode];
+    const playerIndex = keyCodes.indexOf(event.keyCode);
     const playerAndDiv = players[playerIndex];
     if (playerAndDiv) {
       playerAndDiv.soundDiv.style.background = '';
+      playerAndDiv.keydown = false;
+      playerAndDiv.key.style.transform = '';
     }
   });
+}
 
-  function stopAll() {
-    players.forEach(({player}) => {
-      player.pause();
-    });
-  }
+function stopAll() {
+  players.forEach(({player}) => {
+    player.pause();
+  });
 }

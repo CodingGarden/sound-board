@@ -23,3 +23,12 @@ h1 {
   display: inline-block;
   width: 20%;
 }
+
+img {
+  width: 20%;
+  height: auto;
+}
+
+#stopButton img {
+  transform: scaleX(4);
+}
